@@ -20,6 +20,7 @@
         <FIELD NAME="detect_incidents" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="incidents_settings" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="incidents_info" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="show_max_points" TYPE="int" LENGTH="1" NOTNULL="false" DEFAULT="1" SEQUENCE="false" COMMENT="Show max points for task"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

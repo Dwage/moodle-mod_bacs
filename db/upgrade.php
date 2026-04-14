@@ -920,5 +920,19 @@ function xmldb_bacs_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2025073000, 'bacs');
     }
 
+    if ($oldversion < 2025073100) {
+        // Define field show_max_points to be added to bacs.
+        $table = new xmldb_table('bacs');
+        $field = new xmldb_field('show_max_points', XMLDB_TYPE_INTEGER, '1', null, null, null, '1', 'incidents_info');
+
+        // Conditionally launch add field show_max_points.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Bacs savepoint reached.
+        upgrade_mod_savepoint(true, 2025073100, 'bacs');
+    }
+
     return true;
 }

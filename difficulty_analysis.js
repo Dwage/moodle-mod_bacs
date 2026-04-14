@@ -64,27 +64,15 @@
      * @returns {Array} Array of task IDs
      */
     function collectTaskIds() {
-        const tasksList = document.getElementById('tasks_reorder_list');
+        const tasksList = document.getElementById('classic_tasks_reorder_list');
         const taskIds = [];
 
         if (tasksList && tasksList.children.length > 0) {
             for (let i = 0; i < tasksList.children.length; i++) {
                 const taskElement = tasksList.children[i];
-                // Try different ways to get task ID
-                let taskId = null;
-                if (taskElement.firstElementChild) {
-                    taskId = taskElement.firstElementChild.innerHTML || taskElement.firstElementChild.textContent;
-                } else if (taskElement.querySelector('.tasks_reorder_list_idholder')) {
-                    taskId = taskElement.querySelector('.tasks_reorder_list_idholder').innerHTML ||
-                        taskElement.querySelector('.tasks_reorder_list_idholder').textContent;
-                }
-
-                if (taskId) {
-                    // Trim whitespace and convert to number
-                    taskId = parseInt(taskId.toString().trim(), 10);
-                    if (!isNaN(taskId) && taskId > 0) {
-                        taskIds.push(taskId);
-                    }
+                const taskId = parseInt(taskElement.dataset.id, 10);
+                if (!isNaN(taskId) && taskId > 0) {
+                    taskIds.push(taskId);
                 }
             }
         }
