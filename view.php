@@ -55,11 +55,9 @@ if ($contest->currentgroupidbacs == 0) {
     $standings->submitsjsonbacs = $contest->bacs->standings;
 } else {
     $groupinfoentry = $contest->currentgroupinfobacs;
-
     if ($groupinfoentry) {
         $standings->submitsjsonbacs = $groupinfoentry->standings;
     }
-
     if ($groupinfoentry && $groupinfoentry->use_group_settings) {
         $standings->endtime   = $groupinfoentry->endtime;
         $standings->starttime = $groupinfoentry->starttime;
@@ -80,24 +78,29 @@ foreach ($selectedstudents as $curstudent) {
         'endtime'   => $curstudent->endtime,
     ];
 }
-
 $standings->studentsjsonbacs = json_encode($formattedstudents);
 
 // ...prepare tasks.
-$tasks = [];
+$tasks_for_js = []; 
+$tasks_for_template = []; 
 foreach ($contest->tasks as $task) {
-    $standingstask = new stdClass();
-
-    $standingstask->task_id    = $task->task_id;
-    $standingstask->name       = bacs_get_localized_name($task);
-    $standingstask->task_order = $task->task_order;
-
-    $tasks[] = $standingstask;
+    $tasks_for_js[] = [
+        'task_id'    => $task->task_id,
+        'name'       => bacs_get_localized_name($task),
+        'task_order' => $task->task_order, 
+    ];
+    $tasks_for_template[] = (object)[
+        'task_id'    => $task->task_id,
+        'name'       => bacs_get_localized_name($task),
+        'task_order' => $task->letter,
+    ];
 }
-$standings->tasksjsonbacs = json_encode($tasks);
+$standings->tasksjsonbacs = json_encode($tasks_for_js);
+// $standings->tasks_for_template = $tasks_for_template;
+
 
 // ...prepare localized strings.
-$standings->localizedstringsjsonbacs = json_encode([
+$strings_for_js = [
     'submits'          => get_string('submits', 'mod_bacs'),
     'submitslowercase' => get_string('submitslowercase', 'mod_bacs'),
     'username'         => get_string('username', 'mod_bacs'),
@@ -106,8 +109,13 @@ $standings->localizedstringsjsonbacs = json_encode([
     'lastimprovedat'   => get_string('lastimprovedat', 'mod_bacs'),
     'amountofaccepted' => get_string('amountofaccepted', 'mod_bacs'),
     'amountoftried'    => get_string('amountoftried', 'mod_bacs'),
-]);
-
+    'timefromstart'    => get_string('timefromstart', 'mod_bacs'),
+    'showupsolving'    => get_string('showupsolving', 'mod_bacs'),
+    'hideupsolving'    => get_string('hideupsolving', 'mod_bacs'),
+    'verdict_ok'       => get_string('verdict_ok', 'mod_bacs'),
+    'verdict_not_ok'   => get_string('verdict_not_ok', 'mod_bacs'),
+];
+$standings->localizedstringsjsonbacs = json_encode($strings_for_js);
 
 print $contest->bacsoutput->render($standings);
 

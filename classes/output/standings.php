@@ -49,6 +49,10 @@ class standings implements renderable, templatable {
     /**
      * @var mixed
      */
+    public $tasks_for_template;
+    /**
+     * @var mixed
+     */
     public $incidentsjsonbacs;
     /**
      * @var mixed
@@ -111,6 +115,7 @@ class standings implements renderable, templatable {
         $data->submits_json           = $this->submitsjsonbacs;
         $data->students_json          = $this->studentsjsonbacs;
         $data->tasks_json             = $this->tasksjsonbacs;
+        $data->tasks_for_template     = $this->tasks_for_template;
         $data->incidents_json         = $this->incidentsjsonbacs;
         $data->localized_strings_json = $this->localizedstringsjsonbacs;
 

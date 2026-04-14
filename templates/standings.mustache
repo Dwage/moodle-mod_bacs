@@ -1,127 +1,57 @@
-{{#contest_is_over}}
-    <script>
-            function toggle_upsolving() {
-                var upsolving_button = document.getElementById('upsolving_button');
-                if (standings.toggle_upsolving()) {
-                    upsolving_button.innerHTML = '{{#str}} showupsolving, mod_bacs {{/str}}';
-                } else {
-                    upsolving_button.innerHTML = '{{#str}} hideupsolving, mod_bacs {{/str}}';
-                }
-            }
-        </script>
-
-    <div class="float-right">
-        <button id='upsolving_button' class='btn btn-info m-1' onclick='toggle_upsolving();'>
-            {{#str}} hideupsolving, mod_bacs {{/str}}
-        </button>
-    </div>
-{{/contest_is_over}}
-
-<script type='text/javascript'>
-    function toggle_standings_settings() {
-        var standings_settings_container = document.getElementById('standings_settings_container');
-
-        if (standings_settings_container.classList.contains('d-block')) {
-            standings_settings_container.classList.remove('d-block');
-            standings_settings_container.classList.add('d-none');
-        } else {
-            standings_settings_container.classList.add('d-block');
-            standings_settings_container.classList.remove('d-none');
-        }
-    }
-
-    function toggle_inactive() {
-        var hide_inactive_checkbox = document.getElementById('hide_inactive_checkbox');
-        hide_inactive_checkbox.checked = standings.toggle_inactive();
-    }
-
-    function toggle_first_accepted_flag() {
-        var show_first_accepted_flag = document.getElementById('show_first_accepted_flag');
-        show_first_accepted_flag.checked = standings.toggle_show_first_accepted_flag();
-    }
-
-    function toggle_incident_flags() {
-        var show_incident_flags = document.getElementById('show_incident_flags');
-        show_incident_flags.checked = standings.toggle_show_incident_flags();
-    }
-
-    function toggle_testing_flag() {
-        var show_testing_flag = document.getElementById('show_testing_flag');
-        show_testing_flag.checked = standings.toggle_show_testing_flag();
-    }
-
-    function toggle_submits_upto_best() {
-        var show_submits_upto_best = document.getElementById('show_submits_upto_best');
-        show_submits_upto_best.checked = standings.toggle_show_submits_upto_best();
-    }
-
-    function toggle_last_improvement_column() {
-        var show_last_improvement_column = document.getElementById('show_last_improvement_column');
-        show_last_improvement_column.checked = standings.toggle_show_last_improvement_column();
-    }
-
-    function change_standings_mode() {
-        var standings_mode_select = document.getElementById('standings_mode_select');
-
-        standings.set_mode(standings_mode_select.value);
-    }
-</script>
-
-<div class="float-left">
-    <button id='toggle_standings_settings_button' class='btn btn-info m-1' onclick='toggle_standings_settings();'>
-        {{#str}} standingssettings, mod_bacs {{/str}}
-    </button>
-
-    <div id='standings_settings_container' class="d-none">
-        <input type='checkbox' id='hide_inactive_checkbox' onclick='toggle_inactive();'>
-        <label for='hide_inactive_checkbox'> {{#str}} hideinactive, mod_bacs {{/str}} </label>
-
-        <br>
-
-        <input type='checkbox' checked id='show_first_accepted_flag' onclick='toggle_first_accepted_flag();'>
-        <label for='show_first_accepted_flag'> {{#str}} showfirstacceptedflag, mod_bacs {{/str}} </label>
-
-        <br>
-        
-        <input type='checkbox' checked id='show_testing_flag' onclick='toggle_testing_flag();'>
-        <label for='show_testing_flag'> {{#str}} showtestingflag, mod_bacs {{/str}} </label>
-
-        <br>
-
-        <input type='checkbox' id='show_submits_upto_best' onclick='toggle_submits_upto_best();'>
-        <label for='show_submits_upto_best'> {{#str}} showsubmitsuptobest, mod_bacs {{/str}} </label>
-
-        <br>
-
-        <input type='checkbox' id='show_last_improvement_column' onclick='toggle_last_improvement_column();'>
-        <label for='show_last_improvement_column'> {{#str}} showlastimprovementcolumn, mod_bacs {{/str}} </label>
-
-        <br>
-
-        <input type='checkbox' id='show_incident_flags' onclick='toggle_incident_flags();'>
-        <label for='show_incident_flags'> {{#str}} showincidentflags, mod_bacs {{/str}} </label>
-
-        <br>
-
-        <span class="d-none">
-            <label for='standings_mode_select'> {{#str}} standingsmode, mod_bacs {{/str}} </label>
-            <select id='standings_mode_select' value=2 onchange='change_standings_mode();'>
-                <option value=0 {{#mode_ioi_selected}}     selected {{/mode_ioi_selected}}     >IOI</option>
-                <option value=1 {{#mode_icpc_selected}}    selected {{/mode_icpc_selected}}    >ICPC</option>
-                <option value=2 {{#mode_general_selected}} selected {{/mode_general_selected}} >General</option>
-            </select>
-        </span>
-
-    </div>
-</div>
-
-<table class='generaltable' id='standings_table'></table>
-
+{{! Load Libraries }}
+<script type='text/javascript' src='{{config.wwwroot}}/mod/bacs/thirdparty/chart.umd.js'></script>
+<script type='text/javascript' src='{{config.wwwroot}}/mod/bacs/thirdparty/chartjs-plugin-zoom.min.js'></script>
 <script type='text/javascript' src='standings.js'></script>
 
 <script type='text/javascript'>
+    window.BACS_PAGE_DATA = {
+        submissions: {{{submits_json}}},
+        students: {{{students_json}}},
+        tasks: {{{tasks_json}}},
+        contest: {
+            starttime: {{starttime}},
+            endtime: {{endtime}},
+            localizedStrings: {{{localized_strings_json}}}
+        }
+    };
+</script>
+
+{{! Load Modular Scripts (Adjust paths relative to your wwwroot/mod/bacs/js-charts/) }}
+<script type='text/javascript' src='js-charts/bacs_utils.js'></script>
+<script type='text/javascript' src='js-charts/chart_leader_dynamics.js'></script>
+<script type='text/javascript' src='js-charts/chart_results.js'></script>
+<script type='text/javascript' src='js-charts/chart_task_dynamics.js'></script>
+<script type='text/javascript' src='js-charts/bacs_main.js'></script>
+
+{{! Buttons to toggle between different views }}
+<div class="bacs-view-toggles btn-group mb-3" role="group" aria-label="View toggles">
+    <button type="button" class="btn btn-primary active" data-view="monitor"><i class="bi bi-table"></i> {{#str}} view_monitor, mod_bacs {{/str}}</button>
+    <button type="button" class="btn btn-secondary" data-view="leader-dynamics"><i class="bi bi-graph-up-arrow"></i> {{#str}} view_leaderdynamics, mod_bacs {{/str}}</button>
+    <button type="button" class="btn btn-secondary" data-view="results-graph"><i class="bi bi-bar-chart"></i> {{#str}} view_resultsgraph, mod_bacs {{/str}}</button>
+    <button type="button" class="btn btn-secondary" data-view="task-dynamics"><i class="bi bi-pie-chart"></i> {{#str}} view_taskdynamics, mod_bacs {{/str}}</button>
+</div>
+
+{{! Container for all views - now populated with partials }}
+<div class="bacs-views-container">
+    {{> mod_bacs/partials/standings_monitor }}
+    {{> mod_bacs/partials/standings_leader_dynamics }}
+    {{> mod_bacs/partials/standings_results_graph }}
+    {{> mod_bacs/partials/standings_task_dynamics }}
+</div>
+
+
+{{! Original script for standings.js initialization. }}
+<script type='text/javascript'>
     var saved_value_hide_inactive = JSON.parse(localStorage.getItem('standings_hide_inactive'));
-    document.getElementById('hide_inactive_checkbox').checked = saved_value_hide_inactive;
+    var saved_value_split_fullname = JSON.parse(localStorage.getItem('standings_split_fullname')); // НОВОЕ
+
+    if (document.getElementById('hide_inactive_checkbox')) {
+        document.getElementById('hide_inactive_checkbox').checked = saved_value_hide_inactive;
+    }
+    if (document.getElementById('split_fullname_checkbox')) {
+        document.getElementById('split_fullname_checkbox').checked = saved_value_split_fullname; // НОВОЕ
+    }
+
     var standings = new Standings(
         {{{students_json}}}, 
         {{{tasks_json}}}, 
@@ -136,5 +66,104 @@
         {{#user_capability_viewany}} true {{/user_capability_viewany}}  {{^user_capability_viewany}} false {{/user_capability_viewany}},
         {{{localized_strings_json}}},
         {{{incidents_json}}},
+        saved_value_split_fullname 
     );
+</script>
+
+<script type="text/javascript">
+document.addEventListener("DOMContentLoaded", function() {
+    
+    let sortDirection = 1;
+
+    function enhanceStandingsTable() {
+        const table = document.getElementById('standings_table');
+        if (!table) return;
+
+        const rows = table.querySelectorAll('tbody tr');
+        rows.forEach(row => {
+            const nameCells = row.querySelectorAll('td[data-user-id]'); 
+            nameCells.forEach(nameCell => {
+                if (!nameCell.querySelector('a.profile-link')) {
+                    let subEl = nameCell.querySelector('sub');
+                    let subHtml = subEl ? subEl.outerHTML : '';
+                    if (subEl) subEl.remove();
+
+                    let nameText = nameCell.textContent.trim();
+                    let userId = nameCell.getAttribute('data-user-id');
+                    
+                    if (userId && nameText) {
+                        nameCell.innerHTML = `<a href="/user/view.php?id=${userId}" target="_blank" class="profile-link" style="text-decoration: none; color: var(--bacs-primary-color, #0f6cbf); font-weight: 500;">
+                            <i class="bi bi-person-circle text-muted me-1"></i> ${nameText}
+                        </a> ${subHtml}`;
+                    }
+                }
+            });
+        });
+
+        const headers = table.querySelectorAll('thead th');
+        headers.forEach((th, index) => {
+            if(th.classList.contains('sort-enabled')) return;
+            
+            th.classList.add('sort-enabled');
+            th.style.cursor = 'pointer';
+            th.title = "Нажмите для сортировки";
+            
+            if(!th.querySelector('.sort-icon')) {
+                th.innerHTML += ' <i class="bi bi-arrow-down-up text-muted sort-icon" style="font-size: 0.7em; margin-left: 4px;"></i>';
+            }
+
+            th.addEventListener('click', () => {
+                sortTable(table, index);
+            });
+        });
+    }
+
+    function sortTable(table, colIndex) {
+        const tbody = table.querySelector('tbody');
+        if(!tbody) return;
+        
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        sortDirection = sortDirection * -1; 
+
+        rows.sort((a, b) => {
+            let cellA = a.cells[colIndex] ? a.cells[colIndex].textContent.trim() : "";
+            let cellB = b.cells[colIndex] ? b.cells[colIndex].textContent.trim() : "";
+
+            cellA = cellA.replace(/\[.*\]/g, '').trim();
+            cellB = cellB.replace(/\[.*\]/g, '').trim();
+
+            let numA = parseFloat(cellA);
+            let numB = parseFloat(cellB);
+
+            if (!isNaN(numA) && !isNaN(numB)) {
+                return (numA - numB) * sortDirection;
+            }
+            
+            return cellA.localeCompare(cellB) * sortDirection;
+        });
+
+        table.querySelectorAll('thead th i.sort-icon').forEach(i => i.className = 'bi bi-arrow-down-up text-muted sort-icon');
+        const clickedIcon = table.querySelectorAll('thead th')[colIndex].querySelector('i.sort-icon');
+        if (clickedIcon) {
+            clickedIcon.className = sortDirection === 1 ? 'bi bi-caret-up-fill text-primary sort-icon' : 'bi bi-caret-down-fill text-primary sort-icon';
+        }
+
+        rows.forEach(row => tbody.appendChild(row));
+    }
+
+    const observer = new MutationObserver((mutations) => {
+        observer.disconnect(); 
+        enhanceStandingsTable();
+        observer.observe(document.getElementById('standings_table'), { childList: true, subtree: true });
+    });
+    
+    setTimeout(() => {
+        const tbl = document.getElementById('standings_table');
+        if(tbl) {
+            enhanceStandingsTable();
+            observer.observe(tbl, { childList: true, subtree: true });
+        }
+    }, 500);
+
+});
 </script>
