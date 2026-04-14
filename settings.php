@@ -79,4 +79,14 @@ if ($ADMIN->fulltree) {
             ],
         )
     );
+
+    // WebSockets
+    $settings->add(new admin_setting_configtext('mod_bacs/ws_url', 
+        'WebSocket URL (Public)', 'Публичный URL Node.js сервера (например, http://moodle.site:3000)', '', PARAM_URL));
+
+    $settings->add(new admin_setting_configtext('mod_bacs/ws_internal_url', 
+        'WebSocket URL (Internal API)', 'Внутренний URL для вебхуков (например, http://localhost:3000/internal/notify)', '', PARAM_URL));
+
+    $settings->add(new admin_setting_configpasswordunmask('mod_bacs/ws_secret', 
+        'WebSocket Secret Key', 'Секретный ключ для JWT и вебхуков (должен совпадать с ключом в Node.js)', 'super-secret-bacs-key-2024', PARAM_RAW));
 }

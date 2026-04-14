@@ -34,6 +34,19 @@ use stdClass;
  * @package mod_bacs
  */
 class tasklist implements renderable, templatable {
+
+    /**
+     * @var mixed
+     */
+    public $showmaxpointsbacs;
+    /**
+     * @var mixed
+     */
+    public $ws_url;
+    /**
+     * @var mixed
+     */
+    public $ws_jwt;
     /**
      * @var mixed
      */
@@ -99,6 +112,10 @@ class tasklist implements renderable, templatable {
         $data->can_submit_message = $this->cansubmitmessagebacs;
         $data->coursemodule_id    = $this->coursemoduleidbacs;
         $data->show_points        = $this->showpointsbacs;
+        $data->show_max_points_setting = $this->showmaxpointsbacs;
+
+        $data->ws_url = $this->ws_url;
+        $data->ws_jwt = $this->ws_jwt;
 
         return $data;
     }

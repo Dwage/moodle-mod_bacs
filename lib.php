@@ -1093,3 +1093,45 @@ function bacs_diagnostics_task_statement_format() {
 
     return $result;
 }
+
+/**
+ * Generates a JWT token using HS256.
+ *
+ * @param array $payload Data to include in the token payload
+ * @param string $secret Secret key used to sign the token
+ * @return string Generated JWT token
+ */
+function bacs_generate_jwt($payload, $secret) {
+    $header = json_encode(['typ' => 'JWT', 'alg' => 'HS256']);
+    $base64UrlHeader = str_replace(['+', '/', '='],['-', '_', ''], base64_encode($header));
+    $base64UrlPayload = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode(json_encode($payload)));
+    $signature = hash_hmac('sha256', $base64UrlHeader . "." . $base64UrlPayload, $secret, true);
+    $base64UrlSignature = str_replace(['+', '/', '='], ['-', '_', ''], base64_encode($signature));
+    return $base64UrlHeader . "." . $base64UrlPayload . "." . $base64UrlSignature;
+}
+
+/**
+ * Sends submission notification to the WebSocket broker.
+ *
+ * @param int $userid ID of the user who submitted
+ * @param array $submitdata Data related to the submission
+ * @return void
+ */
+function bacs_notify_ws_broker($userid, $submitdata) {
+    $url = get_config('mod_bacs', 'ws_internal_url');
+    $secret = get_config('mod_bacs', 'ws_secret');
+    if (empty($url) || empty($secret)) return;
+
+    $payload =[
+        'user_id' => $userid,
+        'data' => $submitdata
+    ];
+
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+    curl_setopt($ch, CURLOPT_HTTPHEADER,['Content-Type: application/json', 'X-Auth-Secret: ' . $secret]);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 2); 
+    curl_exec($ch);
+    curl_close($ch);
+}

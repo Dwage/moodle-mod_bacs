@@ -338,6 +338,28 @@ class cron_lib {
 
             $transaction->allow_commit();
 
+            // --- FOR WEBSOCKETS ---
+            $runningsubmit_user_id = 0;
+            foreach ($submits as $s) {
+                if ($s->id == $submitid) {
+                    $runningsubmit_user_id = $s->user_id;
+                    break;
+                }
+            }
+
+            if ($runningsubmit_user_id) {
+                $ws_data =[
+                    'submit_id' => $submitid,
+                    'result_id' => $submit->result_id,
+                    'points' => $submit->points,
+                    'verdict_css_class' => bacs_verdict_to_css_class($submit->result_id),
+                    'verdict_formatted' => format_verdict($submit->result_id),
+                    'time_formatted' => format_time_consumed($maxtimeused),
+                    'memory_formatted' => format_memory_consumed($maxmemoryused),
+                ];
+                bacs_notify_ws_broker($runningsubmit_user_id, $ws_data);
+            }
+
             unset($submits[$submitid]);
         }
 

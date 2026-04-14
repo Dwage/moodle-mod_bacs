@@ -28,14 +28,16 @@
         <th class="header c3" scope="col">{{#str}} points,      mod_bacs {{/str}}</th>
         {{/show_points}}
         
+        <th class="header" scope="col">{{#str}} status, mod_bacs {{/str}}</th>
+        
         <th class="header c4" scope="col">{{#str}} timelimit,   mod_bacs {{/str}}</th>
         <th class="header c5 lastcol" scope="col">{{#str}} memorylimit, mod_bacs {{/str}}</th>
     </tr>
 </thead>
 
-<tbody>
+<tbody id="tasks-accordion">
 {{#tasks}}
-    <tr class="{{tr_color_class}}">
+    <tr id="task_row_{{task_id}}" class="{{tr_color_class}}">
         <td class="cell c0 custom-row-collapse-icon collapsed cursor-pointer" {{{td_toggle_attr}}}>
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-up" viewBox="0 0 16 16">
                 <path fill-rule="evenodd" d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708l6-6z"/>
@@ -90,9 +92,35 @@
 
         {{#show_points}}
             <td class="cell c3 cursor-pointer" {{{td_toggle_attr}}}>
-                {{points}} 
+                <span id="task_points_{{task_id}}" class="fw-bold">{{points}}</span>
+                
+                {{#show_max_points_setting}}
+                    <span class="text-muted" style="font-size: 0.85em;"> / {{max_points}}</span>
+                {{/show_max_points_setting}}
             </td>
         {{/show_points}}
+
+        <td class="cell cell-status cursor-pointer" {{{td_toggle_attr}}}>
+            {{#best_submit_id}}
+                <a id="task_status_link_{{task_id}}" href="results_for_submit.php?id={{coursemodule_id}}&submit_id={{best_submit_id}}" target="_blank" onclick="event.stopPropagation();" class="bacs-status-link">
+                    <span id="task_status_{{task_id}}">{{current_status}}</span>
+                    <svg id="task_status_icon_{{task_id}}" class="bi bi-box-arrow-up-right status-link-icon" style="margin-left: 6px; opacity: 0.7;" width="12" height="12" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                      <path fill-rule="evenodd" d="M8.636 2.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 .5.5v5a.5.5 0 0 1-1 0V3.707L4.354 12.854a.5.5 0 1 1-.708-.708L12.293 3H9.136a.5.5 0 0 1-.5-.5z"/>
+                      <path fill-rule="evenodd" d="M1.5 1a.5.5 0 0 0-.5.5v13a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5V10a.5.5 0 0 1 1 0v4a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 14.5v-13A1.5 1.5 0 0 1 1.5 0h4a.5.5 0 0 1 0 1h-4z"/>
+                    </svg>
+                </a>
+            {{/best_submit_id}}
+            
+            {{^best_submit_id}}
+                <a id="task_status_link_{{task_id}}" href="javascript:void(0);" target="_blank" onclick="event.stopPropagation();" class="bacs-status-link disabled-link">
+                    <span id="task_status_{{task_id}}">{{current_status}}</span>
+                    <svg id="task_status_icon_{{task_id}}" class="bi bi-box-arrow-up-right status-link-icon d-none" style="margin-left: 6px; opacity: 0.7;" width="12" height="12" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                      <path fill-rule="evenodd" d="M8.636 2.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 .5.5v5a.5.5 0 0 1-1 0V3.707L4.354 12.854a.5.5 0 1 1-.708-.708L12.293 3H9.136a.5.5 0 0 1-.5-.5z"/>
+                      <path fill-rule="evenodd" d="M1.5 1a.5.5 0 0 0-.5.5v13a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5V10a.5.5 0 0 1 1 0v4a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 14.5v-13A1.5 1.5 0 0 1 1.5 0h4a.5.5 0 0 1 0 1h-4z"/>
+                    </svg>
+                </a>
+            {{/best_submit_id}}
+        </td>
 
         <td class="cell c4 cursor-pointer" {{{td_toggle_attr}}}>
             {{#is_missing}} 
@@ -116,12 +144,12 @@
     </tr>
 
     <tr class="" id="div collapse{{task_order}}">
-        <td colspan="6">
-            <div id="collapse{{task_order}}" class="bs-docs-grid fcontainer clearfix collapse">
+        <td colspan="7">
+            <div id="collapse{{task_order}}" class="bs-docs-grid fcontainer clearfix collapse" data-parent="#tasks-accordion" data-bs-parent="#tasks-accordion">
                 {{{can_submit_message}}}
 
                 {{#can_submit}}
-                    <form enctype="multipart/form-data" action="submit.php" method="POST">
+                    <form id="form_{{task_id}}" onsubmit="event.preventDefault(); sendSolutionInBg(this, '{{task_id}}', '{{task_order}}');">
                     <fieldset>
                     <div class="settingsform clearfix">
                         <input type="hidden" name="section" value="optionalsubsystems">
@@ -162,6 +190,10 @@
 
                             </div>
                         </div>
+                        
+                        <div id="success_msg_task_{{task_id}}" class="alert alert-success d-none mt-2" style="padding: 5px 10px;">
+                            Решение отправлено! Ожидание результата...
+                        </div>
 
                         <div class="form-item clearfix" id="admin-usetags">
                             <div class="form-label">
@@ -169,15 +201,15 @@
                             </div>
                             <div class="form-setting">
                                 <div class="form-checkbox defaultsnext">
-                                    <button id="sendbuttonlocked{{task_order}}" class="btn btn-success d-none" disabled>
-                                        <svg class="bi bi-arrow-repeat" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                    <button id="sendbuttonlocked{{task_order}}" class="btn btn-secondary d-none" disabled>
+                                        <svg class="bi bi-arrow-repeat spin" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                                             <path fill-rule="evenodd" d="M2.854 7.146a.5.5 0 0 0-.708 0l-2 2a.5.5 0 1 0 .708.708L2.5 8.207l1.646 1.647a.5.5 0 0 0 .708-.708l-2-2zm13-1a.5.5 0 0 0-.708 0L13.5 7.793l-1.646-1.647a.5.5 0 0 0-.708.708l2 2a.5.5 0 0 0 .708 0l2-2a.5.5 0 0 0 0-.708z"/>
                                             <path fill-rule="evenodd" d="M8 3a4.995 4.995 0 0 0-4.192 2.273.5.5 0 0 1-.837-.546A6 6 0 0 1 14 8a.5.5 0 0 1-1.001 0 5 5 0 0 0-5-5zM2.5 7.5A.5.5 0 0 1 3 8a5 5 0 0 0 9.192 2.727.5.5 0 1 1 .837.546A6 6 0 0 1 2 8a.5.5 0 0 1 .501-.5z"/>
                                         </svg>
                                         {{#str}}sendinginprogress, mod_bacs{{/str}}
                                     </button>
 
-                                    <button id="sendbutton{{task_order}}" type="submit" class="btn btn-success" onclick="{{submit_onclick_js}}">
+                                    <button id="sendbutton{{task_order}}" type="submit" class="btn btn-success">
                                         {{#str}}send, mod_bacs{{/str}}
                                     </button>
                                 </div>
@@ -194,5 +226,142 @@
 {{/tasks}}
 
 </tbody>
-
 </table>
+
+<script>
+    async function sendSolutionInBg(formElement, taskId, taskOrder) {
+        const btnSend = document.getElementById('sendbutton' + taskOrder);
+        const btnLock = document.getElementById('sendbuttonlocked' + taskOrder);
+        const successMsg = document.getElementById('success_msg_task_' + taskId);
+        
+        btnSend.classList.add('d-none');
+        btnLock.classList.remove('d-none');
+        if (successMsg) successMsg.classList.add('d-none');
+
+        const formData = new FormData(formElement);
+
+        try {
+            const response = await fetch('ajax_submit.php', { method: 'POST', body: formData });
+            const data = await response.json();
+
+            if (data.status === 'ok') {
+                if (successMsg) successMsg.classList.remove('d-none'); 
+                
+                const taskRow = document.getElementById('task_row_' + taskId);
+                const isAlreadyAccepted = taskRow && taskRow.classList.contains('verdict-accepted');
+                
+                if (!isAlreadyAccepted) {
+                    if (taskRow) {
+                        taskRow.classList.remove('verdict-failed', 'verdict-accepted');
+                        taskRow.classList.add('verdict-none');
+                    }
+                    const statusSpan = document.getElementById('task_status_' + taskId);
+                    if (statusSpan) statusSpan.innerHTML = 'Pending... <svg class="bi bi-arrow-repeat spin" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M2.854 7.146a.5.5 0 0 0-.708 0l-2 2a.5.5 0 1 0 .708.708L2.5 8.207l1.646 1.647a.5.5 0 0 0 .708-.708l-2-2zm13-1a.5.5 0 0 0-.708 0L13.5 7.793l-1.646-1.647a.5.5 0 0 0-.708.708l2 2a.5.5 0 0 0 .708 0l2-2a.5.5 0 0 0 0-.708z"/><path fill-rule="evenodd" d="M8 3a4.995 4.995 0 0 0-4.192 2.273.5.5 0 0 1-.837-.546A6 6 0 0 1 14 8a.5.5 0 0 1-1.001 0 5 5 0 0 0-5-5zM2.5 7.5A.5.5 0 0 1 3 8a5 5 0 0 0 9.192 2.727.5.5 0 1 1 .837.546A6 6 0 0 1 2 8a.5.5 0 0 1 .501-.5z"/></svg>';
+                    
+                    const statusIcon = document.getElementById('task_status_icon_' + taskId);
+                    if (statusIcon) statusIcon.classList.add('d-none');
+                    const statusLink = document.getElementById('task_status_link_' + taskId);
+                    if (statusLink) statusLink.classList.add('disabled-link');
+                }
+
+                if (window.bacsSocket) window.bacsSocket.emit('watch_submits', [data.submit_id]);
+            } else {
+                alert('Sending error: ' + data.msg);
+            }
+        } catch (err) {
+            alert('Network error while sending!');
+        }
+
+        btnSend.classList.remove('d-none');
+        btnLock.classList.add('d-none');
+    }
+</script>
+
+{{#ws_url}}
+<script src="{{ws_url}}/socket.io/socket.io.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        window.bacsSocket = io('{{ws_url}}', {
+            auth: { token: '{{ws_jwt}}' }
+        });
+
+        window.bacsSocket.on('submit_update', (data) => {
+            const row = document.getElementById('task_row_' + data.task_id);
+            
+            if (row) {
+                const successMsg = document.getElementById('success_msg_task_' + data.task_id);
+                if (successMsg) successMsg.classList.add('d-none');
+
+                const isCurrentlyAccepted = row.classList.contains('verdict-accepted');
+                const isIncomingAccepted = data.verdict_css_class === 'verdict-accepted';
+
+                if (!isCurrentlyAccepted || isIncomingAccepted) {
+                    row.classList.remove('verdict-none', 'verdict-accepted', 'verdict-failed');
+                    if (data.verdict_css_class) row.classList.add(data.verdict_css_class);
+                    
+                    const statusEl = document.getElementById('task_status_' + data.task_id);
+                    if (statusEl) statusEl.innerHTML = data.verdict_formatted;
+
+                    const statusLink = document.getElementById('task_status_link_' + data.task_id);
+                    if (statusLink) {
+                        statusLink.href = 'results_for_submit.php?id={{coursemodule_id}}&submit_id=' + data.submit_id;
+                        statusLink.classList.remove('disabled-link');
+                        
+                        const icon = document.getElementById('task_status_icon_' + data.task_id);
+                        if (icon) icon.classList.remove('d-none');
+                    }
+                }
+                
+                const pointsEl = document.getElementById('task_points_' + data.task_id);
+                if (pointsEl) {
+                    const currentPoints = parseInt(pointsEl.innerHTML) || 0;
+                    const newPoints = parseInt(data.points) || 0;
+                    pointsEl.innerHTML = Math.max(currentPoints, newPoints);
+                }
+            }
+        });
+    });
+</script>
+{{/ws_url}}
+
+<style>
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+    .spin { display: inline-block; animation: spin 2s linear infinite; }
+
+    .bacs-status-link {
+        color: inherit !important; 
+        font-weight: 500; 
+        font-size: 0.95em; 
+        text-decoration: none !important;
+        display: inline-flex;
+        align-items: center;
+        padding: 1px 6px; 
+        border-radius: 6px; 
+        
+        background-color: rgba(255, 255, 255, 0.3); 
+        border: 1px solid rgba(255, 255, 255, 0.5); 
+        transition: all 0.15s ease-in-out;
+    }
+
+    .bacs-status-link .status-link-icon {
+        opacity: 0.4; 
+        transition: opacity 0.15s ease;
+    }
+
+    .bacs-status-link:hover {
+        background-color: rgba(255, 255, 255, 0.95); 
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03); 
+    }
+    
+    .bacs-status-link:hover .status-link-icon {
+        opacity: 0.9; 
+    }
+    
+    .bacs-status-link.disabled-link {
+        background-color: transparent !important;
+        border-color: transparent !important;
+        box-shadow: none !important;
+        font-weight: normal;
+        pointer-events: none;
+    }
+</style>

@@ -1,4 +1,3 @@
-
 <script>
     function toggle_solution(id) {
         console.log("toogle_solution(id)");
@@ -47,6 +46,7 @@
         {{/show_date_at_separate_row}}
 
         <tr
+                id="submit_row_{{submit_id}}"
                 class="{{verdict_css_class}} {{collapsed_class_header}} {{#rcfg_can_be_collapsed}}cursor-pointer{{/rcfg_can_be_collapsed}}"
                 title="{{task_letter}}. {{task_name}}"
                 {{#rcfg_can_be_collapsed}}
@@ -57,10 +57,8 @@
                 {{/rcfg_can_be_collapsed}}
         >
             {{#rcfg_show_column_collapse}} 
-                <td class="cell custom-row-collapse-icon accordion-toggle arrow-up">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-up" viewBox="0 0 16 16">
-                        <path fill-rule="evenodd" d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708l6-6z"/>
-                    </svg>
+                <td class="cell custom-row-collapse-icon">
+                    <i class="bi bi-chevron-down"></i>
                 </td>
             {{/rcfg_show_column_collapse}}
 
@@ -69,10 +67,12 @@
             {{#rcfg_show_column_task}}     <td class="cell">{{task_name_formatted}}              </td> {{/rcfg_show_column_task}}
             {{#rcfg_show_column_author}}   <td class="cell">{{user_firstname}} {{user_lastname}} </td> {{/rcfg_show_column_author}}
             {{#rcfg_show_column_language}} <td class="cell">{{lang_name}}                        </td> {{/rcfg_show_column_language}}
-            {{#rcfg_show_column_points}}   <td class="cell">{{{points_formatted}}}               </td> {{/rcfg_show_column_points}}
-            {{#rcfg_show_column_result}}   <td class="cell">{{{verdict_formatted}}}              </td> {{/rcfg_show_column_result}}
-            {{#rcfg_show_column_time}}     <td class="cell">{{max_time_used_formatted}}          </td> {{/rcfg_show_column_time}}
-            {{#rcfg_show_column_memory}}   <td class="cell">{{max_memory_used_formatted}}        </td> {{/rcfg_show_column_memory}}
+            
+            {{#rcfg_show_column_points}}   <td class="cell"><span id="submit_points_{{submit_id}}">{{{points_formatted}}}</span></td> {{/rcfg_show_column_points}}
+            {{#rcfg_show_column_result}}   <td class="cell"><span id="submit_verdict_{{submit_id}}">{{{verdict_formatted}}}</span></td> {{/rcfg_show_column_result}}
+            {{#rcfg_show_column_time}}     <td class="cell"><span id="submit_time_{{submit_id}}">{{max_time_used_formatted}}</span></td> {{/rcfg_show_column_time}}
+            {{#rcfg_show_column_memory}}   <td class="cell"><span id="submit_memory_{{submit_id}}">{{max_memory_used_formatted}}</span></td> {{/rcfg_show_column_memory}}
+            
             {{#rcfg_show_column_sent_at}}  <td class="cell">{{submit_time_formatted}}            </td> {{/rcfg_show_column_sent_at}}
         </tr>
 
@@ -265,5 +265,47 @@
 
     {{/submits}}
 </tbody>
-
 </table>
+
+{{#ws_url}}
+<script src="{{ws_url}}/socket.io/socket.io.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const socket = io('{{ws_url}}', {
+            auth: { token: '{{ws_jwt}}' }
+        });
+
+        socket.on('connect', () => {
+            console.log('Connected to BACS WS Broker!');
+            
+            const pendingRows = document.querySelectorAll('tr.verdict-none[id^="submit_row_"]');
+            if (pendingRows.length > 0) {
+                const submitIds = Array.from(pendingRows).map(row => {
+                    return parseInt(row.id.replace('submit_row_', ''));
+                });
+                
+                socket.emit('watch_submits', submitIds);
+            }
+        });
+
+        socket.on('submit_update', (data) => {
+            const row = document.getElementById('submit_row_' + data.submit_id);
+            if (row) {
+                row.className = data.verdict_css_class + (row.classList.contains('collapsed') ? ' collapsed cursor-pointer' : ' cursor-pointer');
+                
+                const verdictEl = document.getElementById('submit_verdict_' + data.submit_id);
+                if (verdictEl) verdictEl.innerHTML = data.verdict_formatted;
+                
+                const pointsEl = document.getElementById('submit_points_' + data.submit_id);
+                if (pointsEl) pointsEl.innerHTML = data.points;
+                
+                const timeEl = document.getElementById('submit_time_' + data.submit_id);
+                if (timeEl) timeEl.innerHTML = data.time_formatted;
+                
+                const memEl = document.getElementById('submit_memory_' + data.submit_id);
+                if (memEl) memEl.innerHTML = data.memory_formatted;
+            }
+        });
+    });
+</script>
+{{/ws_url}}
