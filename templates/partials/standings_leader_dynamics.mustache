@@ -1,0 +1,22 @@
+<style>
+    .bacs-chart-container {
+        background-color: #FFFFFF; 
+        border: 1px solid #dee2e6; 
+        padding: 1rem;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
+    }
+</style>
+
+<div id="view-leader-dynamics" class="bacs-view">
+    <div class="bacs-chart-container">
+        <div id="leader-dynamics-controls" class="text-center mb-3">
+            <div class="btn-group btn-group-sm" role="group" aria-label="Chart mode toggles">
+                <button type="button" class="btn btn-outline-primary active" data-mode="realtime">{{#str}} chart_mode_realtime, mod_bacs {{/str}}</button>
+                <button type="button" class="btn btn-outline-secondary" data-mode="normalized">{{#str}} chart_mode_normalized, mod_bacs {{/str}}</button>
+            </div>
+        </div>
+
+        <canvas id="leader-dynamics-chart" style="max-height: 600px;"></canvas>
+    </div>
+</div>

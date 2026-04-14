@@ -1,0 +1,92 @@
+<div id="view-monitor" class="bacs-view active">
+    {{#contest_is_over}}
+        <div class="float-right">
+            <button id='upsolving_button' class='btn btn-outline-info btn-sm m-1' onclick='toggle_upsolving();'>
+                <i class="bi bi-clock-history"></i> {{#str}} hideupsolving, mod_bacs {{/str}}
+            </button>
+        </div>
+    {{/contest_is_over}}
+
+    <div class="float-left">
+        <button id='toggle_standings_settings_button' class='btn btn-outline-secondary btn-sm m-1' onclick='toggle_standings_settings();'>
+            <i class="bi bi-sliders"></i> {{#str}} standingssettings, mod_bacs {{/str}}
+        </button>
+        
+        <div id='standings_settings_container' class="d-none border p-3 mt-2 rounded bg-light" style="position: absolute; z-index: 100; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+            <div class="form-check">
+                <input class="form-check-input" type='checkbox' id='hide_inactive_checkbox' onclick='toggle_inactive();'>
+                <label class="form-check-label" for='hide_inactive_checkbox'> {{#str}} hideinactive, mod_bacs {{/str}} </label>
+            </div>
+            
+            <div class="form-check">
+                <input class="form-check-input" type='checkbox' id='split_fullname_checkbox' onclick='toggle_split_fullname();'>
+                <label class="form-check-label" for='split_fullname_checkbox'> Split Full Name </label>
+            </div>
+
+            <div class="form-check">
+                <input class="form-check-input" type='checkbox' checked id='show_first_accepted_flag' onclick='toggle_first_accepted_flag();'>
+                <label class="form-check-label" for='show_first_accepted_flag'> {{#str}} showfirstacceptedflag, mod_bacs {{/str}} </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type='checkbox' checked id='show_testing_flag' onclick='toggle_testing_flag();'>
+                <label class="form-check-label" for='show_testing_flag'> {{#str}} showtestingflag, mod_bacs {{/str}} </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type='checkbox' id='show_submits_upto_best' onclick='toggle_submits_upto_best();'>
+                <label class="form-check-label" for='show_submits_upto_best'> {{#str}} showsubmitsuptobest, mod_bacs {{/str}} </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type='checkbox' id='show_last_improvement_column' onclick='toggle_last_improvement_column();'>
+                <label class="form-check-label" for='show_last_improvement_column'> {{#str}} showlastimprovementcolumn, mod_bacs {{/str}} </label>
+            </div>
+            <div class="form-check mb-2">
+                <input class="form-check-input" type='checkbox' id='show_incident_flags' onclick='toggle_incident_flags();'>
+                <label class="form-check-label" for='show_incident_flags'> {{#str}} showincidentflags, mod_bacs {{/str}} </label>
+            </div>
+            <div class="d-none">
+                <label for='standings_mode_select'> {{#str}} standingsmode, mod_bacs {{/str}} </label>
+                <select id='standings_mode_select' class="form-select form-select-sm" onchange='change_standings_mode();'>
+                    <option value=0 {{#mode_ioi_selected}}selected{{/mode_ioi_selected}}>IOI</option>
+                    <option value=1 {{#mode_icpc_selected}}selected{{/mode_icpc_selected}}>ICPC</option>
+                    <option value=2 {{#mode_general_selected}}selected{{/mode_general_selected}}>General</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    
+    <div class="table-responsive w-100 mt-3">
+        <table class='generaltable table table-hover table-bordered' id='standings_table'></table>
+    </div>
+</div>
+
+<script type='text/javascript'>
+    function toggle_standings_settings() {
+        var container = document.getElementById('standings_settings_container');
+        if (container.classList.contains('d-none')) {
+            container.classList.remove('d-none');
+            container.classList.add('d-block');
+        } else {
+            container.classList.add('d-none');
+            container.classList.remove('d-block');
+        }
+    }
+    function toggle_inactive() { standings.toggle_inactive(); }
+    function toggle_split_fullname() { standings.toggle_split_fullname(); } // НОВЫЙ ОБРАБОТЧИК
+    function toggle_first_accepted_flag() { standings.toggle_show_first_accepted_flag(); }
+    function toggle_testing_flag() { standings.toggle_show_testing_flag(); }
+    function toggle_submits_upto_best() { standings.toggle_show_submits_upto_best(); }
+    function toggle_last_improvement_column() { standings.toggle_show_last_improvement_column(); }
+    function toggle_incident_flags() { standings.toggle_show_incident_flags(); }
+    function change_standings_mode() {
+        standings.set_mode(document.getElementById('standings_mode_select').value);
+    }
+    
+    function toggle_upsolving() {
+        var upsolving_button = document.getElementById('upsolving_button');
+        if (standings.toggle_upsolving()) {
+            upsolving_button.innerHTML = '<i class="bi bi-clock-history"></i> {{#str}} showupsolving, mod_bacs {{/str}}';
+        } else {
+            upsolving_button.innerHTML = '<i class="bi bi-clock-history"></i> {{#str}} hideupsolving, mod_bacs {{/str}}';
+        }
+    }
+</script>
