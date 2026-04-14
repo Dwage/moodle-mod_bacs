@@ -85,6 +85,17 @@ class renderer extends plugin_renderer_base {
      * @return bool|string
      * @throws moodle_exception
      */
+    public function render_statements($page) {
+        $data = $page->export_for_template($this);
+        return parent::render_from_template('mod_bacs/statements', $data);
+    }
+
+    /**
+     * This function
+     * @param object $page
+     * @return bool|string
+     * @throws moodle_exception
+     */
     public function render_contest_header($page) {
         $data = $page->export_for_template($this);
         return parent::render_from_template('mod_bacs/contest_header', $data);

@@ -156,6 +156,11 @@ class contest_nav_menu implements renderable, templatable {
     public $activetabvirtualparticipantsbacs;
 
     /**
+     * @var mixed
+     */
+    public $activetabstatementsbacs;
+
+    /**
      *
      */
     const HTML_ICON_LIGHTNING =
@@ -597,6 +602,7 @@ xmlns="http://www.w3.org/2000/svg">
         $this->activetabvirtualcontestbacs      = ($activetab == 'virtual_contest');
         $this->activetabvirtualparticipantsbacs = ($activetab == 'virtual_participants');
         $this->activetabincidentsbacs           = ($activetab == 'incidents');
+        $this->activetabstatementsbacs          = ($activetab == 'statements');
     }
 
     /**
@@ -622,6 +628,7 @@ xmlns="http://www.w3.org/2000/svg">
         $data->icon_incidents            = self::HTML_ICON_EXCLAMATION_TRIANGE;
         $data->icon_settings             = self::HTML_ICON_GEAR;
         $data->icon_more                 = self::HTML_ICON_VERTICAL_DOTS;
+        $data->icon_statements           = '<i class="bi bi-book"></i>';
 
         // ...other params.
         $data->user_capability_viewany = $this->usercapabilitiesbacs->viewany;
@@ -672,6 +679,7 @@ xmlns="http://www.w3.org/2000/svg">
         $data->show_tab_virtual_participants = $this->activetabvirtualparticipantsbacs;
         $data->show_tab_incidents            = $this->activetabincidentsbacs;
         $data->show_tab_more                 = $snoisolatedf;
+        $data->show_tab_statements           = true;
 
         $data->show_more_item_view                 = true;
         $data->show_more_item_tasks                = true;
@@ -698,6 +706,7 @@ xmlns="http://www.w3.org/2000/svg">
         $data->active_tab_virtual_contest      = $this->activetabvirtualcontestbacs;
         $data->active_tab_virtual_participants = $this->activetabvirtualparticipantsbacs;
         $data->active_tab_incidents            = $this->activetabincidentsbacs;
+        $data->active_tab_statements           = $this->activetabstatementsbacs;
 
         return $data;
     }

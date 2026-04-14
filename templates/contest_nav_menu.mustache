@@ -25,6 +25,15 @@
 	</li>
 	{{/show_tab_tasks}}
 
+	{{#show_tab_statements}}
+	<li class="nav-item">
+		<a class="nav-link {{#active_tab_statements}}active{{/active_tab_statements}}" href="statements.php?id={{coursemodule_id}}">
+			{{{icon_statements}}}
+			{{#str}} statement, mod_bacs {{/str}}
+		</a>
+	</li>
+	{{/show_tab_statements}}
+
 	{{#show_tab_status}}
 	<li class="nav-item">
 		<a class="nav-link {{#active_tab_status}}active{{/active_tab_status}}" href="status.php?id={{coursemodule_id}}">

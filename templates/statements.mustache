@@ -1,0 +1,114 @@
+{{#user_capability_readtasks}}
+<div class="container-fluid mt-4">
+    <div class="row">
+        
+        <div class="col-md-2 col-xl-2 d-none d-md-block">
+            <div class="bacs-sticky-sidebar" style="position: sticky; top: 20px;">
+                <h5 class="mb-3 text-muted border-bottom pb-2">{{#str}} statement, mod_bacs {{/str}}</h5>
+                <div class="list-group" id="statements-list-group">
+                    {{#tasks}}
+                        <a class="list-group-item list-group-item-action border-0 mb-1 rounded bacs-nav-item" href="#stmt-{{task_id}}">
+                            <span class="badge bg-secondary me-2">{{letter}}</span> <small>{{name}}</small>
+                        </a>
+                    {{/tasks}}
+                </div>
+                
+                <div class="mt-4 text-center">
+                    <a href="tasks.php?id={{coursemodule_id}}" class="btn btn-outline-primary btn-sm w-100">
+                        <i class="bi bi-code-slash"></i> К сдаче решений
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-10 col-xl-10">
+            {{#tasks}}
+                <div id="stmt-{{task_id}}" class="card mb-5 shadow-sm border-0">
+                    
+                    <div class="card-header bg-white border-bottom-0 pt-4 pb-0 d-flex justify-content-between align-items-center">
+                        <h2 class="m-0">
+                            <span class="text-primary me-2">{{letter}}.</span> {{name}}
+                        </h2>
+                        
+                        <div class="d-flex align-items-center gap-2">
+                            
+                            {{#has_multiple_statements}}
+                            <select class="form-select form-select-sm bg-light text-secondary border-0 fw-bold statement-lang-selector" 
+                                    data-task-id="{{task_id}}" 
+                                    style="cursor: pointer; min-width: 70px;"
+                                    title="Выбрать язык">
+                                {{#statements_list}}
+                                    <option value="{{embed_url}}" {{#is_active}}selected{{/is_active}}>{{lang}}</option>
+                                {{/statements_list}}
+                            </select>
+                            {{/has_multiple_statements}}
+
+                            <a href="tasks.php?id={{coursemodule_id}}" class="btn btn-sm btn-light border shadow-sm" title="Перейти к сдаче">
+                                <i class="bi bi-box-arrow-up-right"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="card-body p-0 mt-3">
+                        <div class="iframe-container" style="width: 100%; height: 80vh; min-height: 600px; background: #f8f9fa;">
+                            <iframe 
+                                id="iframe-stmt-{{task_id}}"
+                                src="{{default_embed_url}}" 
+                                width="100%" 
+                                height="100%" 
+                                style="border: none; border-bottom-left-radius: 0.3rem; border-bottom-right-radius: 0.3rem;"
+                                title="Условие задачи {{letter}}"
+                                loading="lazy">
+                            </iframe>
+                        </div>
+                    </div>
+                </div>
+            {{/tasks}}
+            
+            {{^tasks}}
+                <div class="alert alert-info text-center">
+                    В этом контесте пока нет доступных задач.
+                </div>
+            {{/tasks}}
+        </div>
+
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const langSelectors = document.querySelectorAll('.statement-lang-selector');
+    
+    langSelectors.forEach(select => {
+        select.addEventListener('change', function() {
+            const taskId = this.dataset.taskId;
+            const newUrl = this.value;
+            
+            const iframe = document.getElementById('iframe-stmt-' + taskId);
+            if (iframe) {
+                iframe.src = newUrl;
+            }
+        });
+    });
+});
+</script>
+
+<style>
+    html { scroll-behavior: smooth; }
+    .bacs-sticky-sidebar .bacs-nav-item {
+        transition: all 0.2s ease; background-color: transparent; color: #495057;
+    }
+    .bacs-sticky-sidebar .bacs-nav-item:hover {
+        background-color: rgba(0, 123, 255, 0.1); color: #007bff; transform: translateX(3px);
+    }
+    .card[id^="stmt-"] { scroll-margin-top: 80px; }
+    
+    .statement-lang-selector:focus { box-shadow: none; outline: none; background-color: #e9ecef !important; }
+</style>
+{{/user_capability_readtasks}}
+
+{{^user_capability_readtasks}}
+    <div class="alert alert-danger text-center mt-4">
+        У вас нет прав для просмотра условий задач.
+    </div>
+{{/user_capability_readtasks}}
