@@ -9,6 +9,26 @@ This is Moodle activity plugin for automatic solution judgment for programming t
 3. Replace NoDefaultKey with your Sybon API key to access the tasks collections. If necessary, configure other default settings.
 4. Use in any course as wished.
 
+### Setting up the WebSocket Server:
+
+To enable real-time updates for submissions without page reloads, you need to configure and run the included Node.js WebSocket broker.
+
+1. Make sure you have **Node.js** and **npm** installed on your server.
+2. Navigate to the WebSocket broker directory:
+   ```bash
+   cd /path/to/your/moodle/mod/bacs/ws-broker
+   ```
+3. Install the required dependencies:
+   ```bash
+   npm install
+   ```
+4. Start the server (runs on port 3000 by default):
+   ```bash
+   node server.js
+   ```
+   *Note for production:* It is highly recommended to run the WebSocket server using a process manager like **PM2** (`pm2 start server.js --name "bacs-ws"`) and set up a reverse proxy (Nginx/Apache) to handle SSL/WSS connections.
+5. Finally, go to your Moodle settings: **Site administration -> Plugins -> Activity modules -> BACS contests** and enter your WebSocket server URL in the settings (e.g., `ws://your-server-ip:3000` or `wss://your-domain.com/ws`).
+
 ### Creating contest:
 
 1. Open your Moodle course page.
@@ -32,6 +52,7 @@ Check [contest settings](mds/Contest%20Settings.md) file for more information.
 - Support for groups of students.
 - Virtual contests that allow each student to participate in the contest at an independent time.
 - The ability to double-check, recalculate points, reject and change the results of parcels.
+- Analytics: Watch participants' progress, rank changes, and task statistics via intelligent dynamic charts.
 
 ### Solving problems in different programming languages:
 
