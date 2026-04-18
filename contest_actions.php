@@ -59,10 +59,14 @@ $htmlselecttaskid = "<select name='task_id' class='form-control mx-2 d-inline' v
 
 print "<p></p>";
 
+$htmlinputsesskey = "<input type='hidden' name='sesskey' value='" . sesskey() . "'>";
+$sesskeyparam = "&sesskey=" . sesskey();
+
 print "<p><form method='get' action='recalculate_points.php' class='form-inline'>
     " . get_string('recalculatepointsfor', 'bacs') . " <br>
     $htmlselecttaskid
     $htmlinputcoursemoduleid
+    $htmlinputsesskey
     <input class='btn btn-primary' type='submit' value='" . get_string('recalculatepoints', 'bacs') . "'>
 </form></p>";
 
@@ -70,14 +74,15 @@ print "<p><form method='get' action='rejudge_submits.php' class='form-inline'>
     " . get_string('rejudgesubmitsfor', 'bacs') . " <br>
     $htmlselecttaskid
     $htmlinputcoursemoduleid
+    $htmlinputsesskey
     <input class='btn btn-primary' type='submit' value='" . get_string('rejudgesubmits', 'bacs') . "'>
 </form></p>";
 
-print "<p><a href='update_standings.php?id=" . $contest->coursemodule->id . "'>
+print "<p><a href='update_standings.php?id=" . $contest->coursemodule->id . $sesskeyparam . "'>
     <button class='btn btn-primary'>" . get_string('updatestandings', 'bacs') . "</button>
 </a></p>";
 
-print "<p><a href='recalculate_incidents.php?id=" . $contest->coursemodule->id . "'>
+print "<p><a href='recalculate_incidents.php?id=" . $contest->coursemodule->id . $sesskeyparam . "'>
     <button class='btn btn-primary'>" . get_string('recalculateincidents', 'bacs') . "</button>
 </a></p>";
 

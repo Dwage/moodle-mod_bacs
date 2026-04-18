@@ -470,6 +470,8 @@ class results_submit {
 
         $data->alerts = $this->alerts;
 
+        $data->sesskey = sesskey();
+
         return $data;
     }
 }

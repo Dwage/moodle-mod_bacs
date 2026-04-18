@@ -38,6 +38,10 @@ global $OUTPUT, $DB;
 $contest = new contest();
 $contest->initialize_page();
 
+require_capability('mod/bacs:edit', $PAGE->context);
+
+require_sesskey();
+
 $contest->pageurlbacs = new moodle_url('/mod/bacs/rejudge_submits.php', ['id' => $contest->coursemodule->id]);
 
 echo $OUTPUT->header();
@@ -117,7 +121,7 @@ try {
         }
 
         if ($contest->bacs->detect_incidents == 1) {
-            bacs_mark_submit_for_incidents_recalc($submit->id);
+            bacs_mark_submit_for_incidents_recalc($submit->id, $contestid);
         }
 
         // ...apply database changes for this submit.

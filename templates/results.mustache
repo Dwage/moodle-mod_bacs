@@ -119,7 +119,8 @@
                                     "id=" + coursemodule_id + "&" +
                                     "submit_id=" + submit_id + "&" +
                                     "property=points" + "&" + 
-                                    "value=" + points;
+                                    "value=" + points + "&" + 
+                                    "sesskey={{sesskey}}";
                             }
                             
                             function request_and_set_comment() {
@@ -134,20 +135,21 @@
                                     "id=" + coursemodule_id + "&" +
                                     "submit_id=" + submit_id + "&" +
                                     "property=comment" + "&" + 
-                                    "value=" + encodeURIComponent(window.btoa(comment));
+                                    "value=" + encodeURIComponent(window.btoa(comment)) + "&" + 
+                                    "sesskey={{sesskey}}";
                             }
                         </script>
 
                         <div class="btn-group mb-2" role="group">
-                            <a class="btn btn-secondary" href="recalculate_points.php?id={{coursemodule_id}}&submit_id={{submit_id}}">
+                            <a class="btn btn-secondary" href="recalculate_points.php?id={{coursemodule_id}}&submit_id={{submit_id}}&sesskey={{sesskey}}">
                                 {{#str}} recalcpoints, mod_bacs {{/str}}
                             </a>
 
-                            <a class="btn btn-secondary" href="rejudge_submits.php?id={{coursemodule_id}}&submit_id={{submit_id}}">
+                            <a class="btn btn-secondary" href="rejudge_submits.php?id={{coursemodule_id}}&submit_id={{submit_id}}&sesskey={{sesskey}}">
                                 {{#str}} rejudge, mod_bacs {{/str}}
                             </a>
 
-                            <a class="btn btn-secondary" href="submit_set_property.php?id={{coursemodule_id}}&submit_id={{submit_id}}&property=verdict&value=18">
+                            <a class="btn btn-secondary" href="submit_set_property.php?id={{coursemodule_id}}&submit_id={{submit_id}}&property=verdict&value=18&sesskey={{sesskey}}">
                                 {{#str}} rejectsubmit,  mod_bacs {{/str}}
                             </a>
                             
@@ -161,7 +163,7 @@
                                 <ul class="dropdown-menu" aria-labelledby="setVerdictBtnGroupDrop">
                                     {{#available_submit_verdicts}}
                                         <li>
-                                            <a class="dropdown-item" href="submit_set_property.php?id={{coursemodule_id}}&submit_id={{submit_id}}&property=verdict&value={{verdict_id}}">{{verdict_name}}</a>
+                                            <a class="dropdown-item" href="submit_set_property.php?id={{coursemodule_id}}&submit_id={{submit_id}}&property=verdict&value={{verdict_id}}&sesskey={{sesskey}}">{{verdict_name}}</a>
                                         </li>
                                     {{/available_submit_verdicts}}
                                 </ul>

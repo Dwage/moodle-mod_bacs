@@ -71,6 +71,7 @@ $devirtualizewarning = get_string('devirtualizewarning', 'mod_bacs');
 $devirtualizewarning = str_replace("\r", "", $devirtualizewarning);
 $devirtualizewarning = str_replace("\n", "", $devirtualizewarning);
 
+$sesskey = sesskey(); 
 print "<script type='text/javascript'>
     function bacs_devirtualize(coursemodule_id, user_id, group_id) {
         if (confirm('$devirtualizewarning')) {
@@ -78,7 +79,8 @@ print "<script type='text/javascript'>
                 '/mod/bacs/devirtualize.php'
                 + '?id=' + coursemodule_id
                 + '&user_id=' + user_id
-                + '&group_id=' + group_id;
+                + '&group_id=' + group_id
+                + '&sesskey=$sesskey'; 
         }
     }
 </script>";

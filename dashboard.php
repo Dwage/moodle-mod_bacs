@@ -133,12 +133,25 @@ function get_filtered_submits($form_data): array
     global $DB;
 
     // Form SQL query with filtering
-    $sql_where = "(submit_time BETWEEN $form_data->from AND $form_data->to)";
-    if ($form_data->course_id != 0) $sql_where .= " AND (course.id = $form_data->course_id)";
-    if ($form_data->task_id != 0) $sql_where .= " AND (task.task_id = $form_data->task_id)";
+    $params = [
+        'from' => $form_data->from,
+        'to'   => $form_data->to
+    ];
+
+    $sql_where = "(submit.submit_time BETWEEN :from AND :to)";
+    
+    if ($form_data->course_id != 0) {
+        $sql_where .= " AND (course.id = :course_id)";
+        $params['course_id'] = $form_data->course_id;
+    }
+    
+    if ($form_data->task_id != 0) {
+        $sql_where .= " AND (task.task_id = :task_id)";
+        $params['task_id'] = $form_data->task_id;
+    }
 
     $sql =
-        "SELECT submit.id AS id, course.id AS course_id, submit_time
+        "SELECT submit.id AS id, course.id AS course_id, submit.submit_time
          FROM {bacs_submits} submit
          JOIN {bacs} contest ON submit.contest_id = contest.id  
          JOIN {course} course ON contest.course = course.id
@@ -147,7 +160,7 @@ function get_filtered_submits($form_data): array
 
     // Filter submits by availability
     $submits = [];
-    foreach ($DB->get_records_sql($sql) as $submit) {
+    foreach ($DB->get_records_sql($sql, $params) as $submit) {
         if (is_course_available($submit->course_id))
             $submits[] = $submit;
     }
@@ -200,11 +213,15 @@ class verdict_chart_database_manipulator{
     }
     public static function get_contests_from_the_course($course_id){
         global $DB;
-        return $DB->get_records_sql("SELECT id FROM {bacs} WHERE course=$course_id;");
+        return $DB->get_records('bacs', ['course' => $course_id], '', 'id');
     }
     public static function get_tasks_from_the_contest($contest_id){
         global $DB;
-        return $DB->get_records_sql("SELECT t2.task_id,t2.name FROM {bacs_tasks_to_contests} AS t1 INNER JOIN {bacs_tasks} as t2 ON t1.task_id=t2.task_id WHERE t1.contest_id=$contest_id;");
+        $sql = "SELECT t2.task_id, t2.name 
+                  FROM {bacs_tasks_to_contests} t1 
+            INNER JOIN {bacs_tasks} t2 ON t1.task_id = t2.task_id 
+                 WHERE t1.contest_id = :contest_id";
+        return $DB->get_records_sql($sql, ['contest_id' => $contest_id]);
     }
     public static function get_contests_from_any_courses($courses){
         $result_contests = array();
@@ -267,11 +284,23 @@ class verdict_chart_controller{
         for ($i = 0; $i<19; $i++){
             $count = 0;
             foreach ($contests as $contest) {
-                $sql_where = "submit_time >= $data->from AND submit_time <= $data->to AND contest_id = $contest->id";
-                if ($data->task_id != 0) $sql_where .= " AND task_id = $data->task_id";
+                $params = [
+                    'from'       => $data->from,
+                    'to'         => $data->to,
+                    'contest_id' => $contest->id,
+                    'result_id'  => $i
+                ];
 
-                $count += $DB->get_field_sql("SELECT COUNT(*) FROM {bacs_submits} WHERE result_id=$i AND $sql_where;");
+                $sql_where = "submit_time >= :from AND submit_time <= :to AND contest_id = :contest_id";
+                
+                if ($data->task_id != 0) {
+                    $sql_where .= " AND task_id = :task_id";
+                    $params['task_id'] = $data->task_id;
+                }
+
+                $count += $DB->get_field_sql("SELECT COUNT(*) FROM {bacs_submits} WHERE result_id = :result_id AND $sql_where", $params);
             }
+            
             if ($count > 0) {
                 $view_bag->counts[] = $count;
                 $view_bag->label_values[] = format_verdict($i);

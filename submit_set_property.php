@@ -33,6 +33,10 @@ require_login();
 $contest = new contest();
 $contest->initialize_page();
 
+require_capability('mod/bacs:edit', $PAGE->context);
+
+require_sesskey();
+
 $contest->pageurlbacs = new moodle_url('/mod/bacs/results_for_submit.php', ['id' => $contest->coursemodule->id]);
 
 print $OUTPUT->header();
