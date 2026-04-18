@@ -333,6 +333,7 @@ class mod_bacs_mod_form extends moodleform_mod
                 <thead class='table-light text-muted small text-uppercase'><tr>
                     <th class='ps-3 py-2' style='width: 80px;'>ID</th>
                     <th class='py-2'>" . get_string('taskname', 'bacs') . "</th>
+                    <th class='py-2 text-center' style='width: 90px;'>Tests(Pre)</th>
                     <th class='py-2' style='width: 60px;'>Fmt</th>
                     {$rating_th}
                     <th class='py-2'>" . get_string('author', 'bacs') . "</th>
@@ -371,9 +372,12 @@ class mod_bacs_mod_form extends moodleform_mod
             }
         }
 
+        $tests_info = ($task->count_tests ?? 0) . " <span class='text-muted'>(" . ($task->count_pretests ?? 0) . ")</span>";
+
         return "<tr data-rating='{$r_val_data}'>" .
                 "<td class='ps-3 text-muted small'>{$task->task_id}</td>" .
                 "<td class='text-truncate' style='max-width: 250px;'><a href='{$task->statement_url}' target='_blank' class='text-decoration-none fw-medium text-dark hover-primary'>{$name}</a></td>" .
+                "<td class='text-center'><span class='small fw-medium'>{$tests_info}</span></td>" .
                 "<td><span class='badge {$fmt_badge} bg-opacity-75' style='font-size: 0.7em;'>{$format}</span></td>" .
                 $rating_td .
                 "<td class='text-muted small text-truncate' style='max-width: 150px;'>{$task->author}</td>" .

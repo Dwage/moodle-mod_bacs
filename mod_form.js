@@ -2,7 +2,7 @@
 /* eslint-disable complexity */
 /* eslint-disable max-len */
 /* global flatpickr, openPointsModal, Sortable*/
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function() {
   const getEl = (id) => document.getElementById(id);
 
   function formatTime(ms) {
@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function () {
   function escapeHtml(text) {
     return !text
       ? ''
-      : text.replace(/[&<>"']/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[m]);
+      : text.replace(/[&<>"']/g, (m) => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'})[m]);
   }
   function parseRawString(str) {
     return !str
@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', function () {
         time_24hr: true,
         allowInput: true,
         defaultDate: getMoodleDate('starttime'),
-        onChange: function (selectedDates) {
+        onChange: function(selectedDates) {
           if (selectedDates[0]) {
             updateSelects('starttime', selectedDates[0]);
             fpEnd.set('minDate', selectedDates[0]);
@@ -110,20 +110,20 @@ document.addEventListener('DOMContentLoaded', function () {
         allowInput: true,
         defaultDate: getMoodleDate('endtime'),
         minDate: getMoodleDate('starttime'),
-        onChange: function (selectedDates) {
+        onChange: function(selectedDates) {
           if (selectedDates[0]) {
             updateSelects('endtime', selectedDates[0]);
           }
         },
       });
 
-      startInput.addEventListener('blur', function () {
+      startInput.addEventListener('blur', function() {
         if (fpStart.selectedDates[0]) {
           updateSelects('starttime', fpStart.selectedDates[0]);
           fpEnd.set('minDate', fpStart.selectedDates[0]);
         }
       });
-      endInput.addEventListener('blur', function () {
+      endInput.addEventListener('blur', function() {
         if (fpEnd.selectedDates[0]) {
           updateSelects('endtime', fpEnd.selectedDates[0]);
         }
@@ -138,7 +138,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const modeCards = document.querySelectorAll('.mode-card');
     if (modeSelect && modeCards.length) {
       modeCards.forEach((c) =>
-        c.addEventListener('click', function () {
+        c.addEventListener('click', function() {
           modeSelect.value = this.dataset.value;
           modeCards.forEach((card) => card.classList.toggle('active', card === this));
         }),
@@ -218,7 +218,7 @@ document.addEventListener('DOMContentLoaded', function () {
     updateHiddenInputs();
   }
 
-  window.collectionSelectorChange = function () {
+  window.collectionSelectorChange = function() {
     const selector = getEl('collection_container_selector');
     if (!selector) {
       return;
@@ -233,7 +233,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   };
 
-  window.tableSearch = function () {
+  window.tableSearch = function() {
     const phrase = getEl('search-text').value.toLowerCase();
     const selector = getEl('collection_container_selector');
     const currContainer = getEl('collection_container_' + selector.value);
@@ -251,7 +251,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   };
 
-  window.cleanSearch = function () {
+  window.cleanSearch = function() {
     const elem = getEl('search-text');
     if (elem) {
       elem.value = '';
@@ -259,7 +259,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   };
 
-  window.addTaskClassic = function (taskId) {
+  window.addTaskClassic = function(taskId) {
     const task = allTasks.find((t) => String(t.task_id) === String(taskId));
     if (task) {
       addTask(task);
@@ -384,7 +384,7 @@ document.addEventListener('DOMContentLoaded', function () {
         animation: 150,
         handle: '.drag-handle',
         ghostClass: 'bg-light',
-        onEnd: function () {
+        onEnd: function() {
           const newOrder = [];
           list.querySelectorAll('.list-group-item').forEach((el) => newOrder.push(el.dataset.id));
           selectedIds = newOrder;
@@ -439,7 +439,7 @@ document.addEventListener('DOMContentLoaded', function () {
       handle.addEventListener('mouseleave', () => col.setAttribute('draggable', 'false'));
     }
 
-    col.addEventListener('dragstart', function (e) {
+    col.addEventListener('dragstart', function(e) {
       if (e.target !== col) {
         return;
       }
@@ -452,7 +452,7 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     });
 
-    col.addEventListener('dragenter', function () {
+    col.addEventListener('dragenter', function() {
       if (!draggedColumn || draggedColumn === this) {
         return;
       }
@@ -466,13 +466,13 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     });
 
-    col.addEventListener('dragover', function (e) {
+    col.addEventListener('dragover', function(e) {
       if (draggedColumn) {
         e.preventDefault();
       }
     });
 
-    col.addEventListener('dragend', function () {
+    col.addEventListener('dragend', function() {
       managerGrid.classList.remove('is-dragging');
       this.classList.remove('col-dragging');
       this.setAttribute('draggable', 'false');
@@ -565,7 +565,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 <div class="mt-meta">
                     <span class="mt-meta-item" title="Time Limit">${icons.time} ${formatTime(task.time_limit_millis)}</span>
                     <span class="mt-meta-item" title="Memory Limit">${icons.memory} ${formatMemory(task.memory_limit_bytes)}</span>
-                    <span class="mt-meta-item" title="Tests Count">${icons.tests} ${task.count_tests || '?'} tst</span>
+                    <span class="mt-meta-item" title="Tests / Pretests">${icons.tests} ${task.count_tests || '0'} / ${task.count_pretests || '0'} pre</span>
                 </div>
             </div>
             <div class="mt-foot">
@@ -597,7 +597,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
       if (!task) {
         isMissing = true;
-        task = { task_id: id, name: `[TASK NOT FOUND, ID=${id}]`, statement_format: 'ERR', count_tests: 0 };
+        task = {task_id: id, name: `[TASK NOT FOUND, ID=${id}]`, statement_format: 'ERR', count_tests: 0};
       }
 
       const el = document.createElement('div');
@@ -608,17 +608,32 @@ document.addEventListener('DOMContentLoaded', function () {
         ? `<button type="button" class="btn-action-settings opacity-50" disabled>${icons.settings}</button>`
         : `<button type="button" class="btn-action-settings" title="Points Settings">${icons.settings}</button>`;
 
+      const timeAndMemory = !isMissing ? `
+            <span class="mt-meta-item" title="Time Limit">${icons.time} ${formatTime(task.time_limit_millis)}</span>
+            <span class="mt-meta-item" title="Memory Limit">${icons.memory} ${formatMemory(task.memory_limit_bytes)}</span>
+      ` : '';
+
+      let ratingHtml = '';
+      if (!isMissing && task.elo_rating !== null && task.elo_rating !== undefined) {
+        let rVal = Math.round(parseFloat(task.elo_rating));
+        let badgeClass = getRatingBadgeClass(rVal);
+        ratingHtml = `<span class="badge ${badgeClass} ms-2" style="font-size:0.7rem;">
+    <i class="bi bi-star-fill me-1"></i>${rVal}</span>`;
+      }
+
       el.innerHTML = `
             <div>
                 <div class="mt-head">
-                    <div class="mt-title-wrapper">
+                    <div class="mt-title-wrapper align-items-center">
                         <span class="mt-order ${isMissing ? 'text-danger border-danger' : ''}">${index + 1}</span>
                         <span class="mt-title ${isMissing ? 'text-danger fw-bold' : ''}" title="${escapeHtml(task.name)}">${escapeHtml(task.name)}</span>
+                        ${ratingHtml}
                     </div>
                     <button type="button" class="btn-action-remove" title="Remove Task">${icons.remove}</button>
                 </div>
                 <div class="mt-meta">
-                    <span class="mt-meta-item ${isMissing ? 'text-danger' : ''}" title="Tests Count">${icons.tests} ${task.count_tests || '?'} tst</span>
+                    ${timeAndMemory}
+                    <span class="mt-meta-item ${isMissing ? 'text-danger' : ''}" title="Tests / Pretests">${icons.tests} ${task.count_tests || '0'} / ${task.count_pretests || '0'} pre</span>
                 </div>
             </div>
             <div class="mt-foot">
@@ -645,7 +660,7 @@ document.addEventListener('DOMContentLoaded', function () {
       Sortable.create(targetList, {
         animation: 150,
         ghostClass: 'bg-light',
-        onEnd: function () {
+        onEnd: function() {
           const newOrder = [];
           targetList.querySelectorAll('.m-task-card').forEach((el) => newOrder.push(el.dataset.id));
           selectedIds = newOrder;
@@ -727,7 +742,7 @@ document.addEventListener('DOMContentLoaded', function () {
   let currentModalTestCount = 0;
   let currentModalPretestCount = 0;
 
-  window.openPointsModal = function (task) {
+  window.openPointsModal = function(task) {
     editingId = String(task.task_id);
     currentModalTestCount = parseInt(task.count_tests) || 0;
     currentModalPretestCount = parseInt(task.count_pretests) || 0;
@@ -881,7 +896,7 @@ document.addEventListener('DOMContentLoaded', function () {
         let ideal = (currentValues[i] / currentSum) * targetSum;
         let floored = Math.floor(ideal);
         floorValues[i] = floored;
-        remainderParts.push({ index: i, fraction: ideal - floored });
+        remainderParts.push({index: i, fraction: ideal - floored});
       }
       let diff = targetSum - floorValues.reduce((a, b) => a + b, 0);
       remainderParts.sort((a, b) => b.fraction - a.fraction);
@@ -932,12 +947,12 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     var rows = Array.from(tbody.rows);
-    rows.sort(function (rowA, rowB) {
+    rows.sort(function(rowA, rowB) {
       var a = parseFloat(rowA.dataset.rating) || 0;
       var b = parseFloat(rowB.dataset.rating) || 0;
       return dir === 'asc' ? a - b : b - a;
     });
-    rows.forEach(function (row) {
+    rows.forEach(function(row) {
       tbody.appendChild(row);
     });
   }
