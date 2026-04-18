@@ -6,19 +6,17 @@ require_once(dirname(__FILE__) . '/lib.php');
 require_once(dirname(__FILE__) . '/classes/cron_lib.php');
 require_once(dirname(__FILE__) . '/submit_verdicts.php'); 
 
-$secret = get_config('mod_bacs', 'ws_secret');
-if (empty($secret)) $secret = 'super-secret-bacs-key-2024';
+$secret = bacs_get_ws_secret();
 
-$headers = getallheaders();
-$provided_secret = isset($headers['X-Auth-Secret']) ? $headers['X-Auth-Secret'] : (isset($_SERVER['HTTP_X_AUTH_SECRET']) ? $_SERVER['HTTP_X_AUTH_SECRET'] : '');
+$provided_secret = isset($_SERVER['HTTP_X_AUTH_SECRET']) ? $_SERVER['HTTP_X_AUTH_SECRET'] : '';
 
-if ($provided_secret !== $secret) {
+if (!hash_equals($secret, $provided_secret)) {
     http_response_code(403);
     die(json_encode(['status' => 'error', 'msg' => 'Forbidden']));
 }
 
 global $DB;
-$updated_submits =[];
+$updated_submits = [];
 
 $json = file_get_contents('php://input');
 $data = json_decode($json);
@@ -43,7 +41,7 @@ try {
             $v_formatted .= " - " . ($submit->test_num_failed + 1);
         }
 
-        $updated_submits[] =[
+        $updated_submits[] = [
             'user_id' => (int)$submit->user_id,
             'submit_id' => (int)$submit->id,
             'task_id' => (int)$submit->task_id, 

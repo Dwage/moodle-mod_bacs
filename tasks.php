@@ -291,12 +291,12 @@ foreach ($contest->tasks as $task) {
         onclick='$prepareaceeditorjs'
     ";
 
-    $tasklisttask->submit_key = md5($USER->email . $USER->sesskey . $contest->coursemodule->id . $task->task_id);
+    $tasklisttask->submit_key = bacs_generate_submit_key($contest->coursemodule->id, $task->task_id);
 
     $tasklist->add_task($tasklisttask);
 }
 
-$ws_secret = get_config('mod_bacs', 'ws_secret');
+$ws_secret = bacs_get_ws_secret();
 $ws_url = get_config('mod_bacs', 'ws_url');
 
 if (!empty($ws_secret) && !empty($ws_url)) {

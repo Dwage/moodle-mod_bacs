@@ -10,13 +10,14 @@ require_login();
 $cmid = required_param('id', PARAM_INT);
 $task_id = required_param('task_id', PARAM_INT);
 $lang_id = required_param('lang_id', PARAM_INT);
-$key = required_param('key', PARAM_RAW);
+$key = required_param('key', PARAM_ALPHANUM); 
 $source = required_param('source', PARAM_RAW);
 
 global $USER, $DB;
 
-$submitkey = md5($USER->email . $USER->sesskey . $cmid . $task_id);
-if ($key !== $submitkey) {
+$submitkey = bacs_generate_submit_key($cmid, $task_id);
+
+if (!hash_equals($submitkey, $key)) {
     die(json_encode(['status' => 'error', 'msg' => 'Security key mismatch']));
 }
 
@@ -26,7 +27,16 @@ try {
     $contest->initialize_page();
 
     $recenttime = time() - 5 * 60;
-    $recentsubmits = $DB->count_records_select('bacs_submits', "submit_time > $recenttime AND user_id = $USER->id");
+    
+    $recentsubmits = $DB->count_records_select(
+        'bacs_submits', 
+        'submit_time > :recenttime AND user_id = :userid', 
+        [
+            'recenttime' => $recenttime, 
+            'userid'     => $USER->id
+        ]
+    );
+    
     if ($recentsubmits > 50) {
         die(json_encode(['status' => 'error', 'msg' => 'Submissions spam penalty']));
     }

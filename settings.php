@@ -87,6 +87,17 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configtext('mod_bacs/ws_internal_url', 
         'WebSocket URL (Internal API)', 'Внутренний URL для вебхуков (например, http://localhost:3000/internal/notify)', '', PARAM_URL));
 
+    global $CFG;
+    $default_ws_secret = hash('sha256', $CFG->siteidentifier . 'bacs_websocket_secret_v1');
+
     $settings->add(new admin_setting_configpasswordunmask('mod_bacs/ws_secret', 
-        'WebSocket Secret Key', 'Секретный ключ для JWT и вебхуков (должен совпадать с ключом в Node.js)', 'super-secret-bacs-key-2024', PARAM_RAW));
+        'WebSocket Secret Key', 'Секретный ключ для JWT и вебхуков. Если пусто — генерируется автоматически.', $default_ws_secret, PARAM_RAW));
+
+
+    $settings->add(new admin_setting_configpasswordunmask('mod_bacs/submit_salt', 
+        'Submit Hash Salt', 
+        'Соль для хэширования ключей при отправке посылок (создается автоматически, если пуста)', 
+        '', 
+        PARAM_RAW
+    ));
 }
